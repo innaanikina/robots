@@ -5,6 +5,7 @@ import java.awt.Toolkit;
 import java.awt.event.KeyEvent;
 
 import javax.swing.*;
+import gui.ExitApp;
 
 import log.Logger;
 
@@ -54,35 +55,6 @@ public class MainApplicationFrame extends JFrame {
         frame.setVisible(true);
     }
 
-    /*protected JMenuBar createMenuBar() {
-        JMenuBar menuBar = new JMenuBar();
-
-        //Set up the lone menu.
-        JMenu menu = new JMenu("Document");
-        menu.setMnemonic(KeyEvent.VK_D);
-        menuBar.add(menu);
-
-        //Set up the first menu item.
-        JMenuItem menuItem = new JMenuItem("New");
-        menuItem.setMnemonic(KeyEvent.VK_N);
-        menuItem.setAccelerator(KeyStroke.getKeyStroke(
-                KeyEvent.VK_N, ActionEvent.ALT_MASK));
-        menuItem.setActionCommand("new");
-//        menuItem.addActionListener(this);
-        menu.add(menuItem);
-
-        //Set up the second menu item.
-        menuItem = new JMenuItem("Quit");
-        menuItem.setMnemonic(KeyEvent.VK_Q);
-        menuItem.setAccelerator(KeyStroke.getKeyStroke(
-                KeyEvent.VK_Q, ActionEvent.ALT_MASK));
-        menuItem.setActionCommand("quit");
-//        menuItem.addActionListener(this);
-        menu.add(menuItem);
-
-        return menuBar;
-    }*/
-
     private void addToMenu(JMenu menu, String txt, int eventNum) {
         JMenuItem currentItem = new JMenuItem(txt, eventNum);
         currentItem.addActionListener((event) -> {
@@ -109,7 +81,12 @@ public class MainApplicationFrame extends JFrame {
 
 
         JMenu testMenu = addReturnTab("Тесты", KeyEvent.VK_T,
-                "Тестовые команды");
+                "Тестовые команды.");
+
+        JMenu mainMenu = addReturnTab("Программа", KeyEvent.VK_P, "Программное меню");
+        JMenuItem exitItem = new JMenuItem("Выход", KeyEvent.VK_ESCAPE);
+        exitItem.addActionListener(new ExitApp());
+        mainMenu.add(exitItem);
 
         {
             JMenuItem addLogMessageItem = new JMenuItem("Сообщение в лог", KeyEvent.VK_S);
@@ -119,6 +96,7 @@ public class MainApplicationFrame extends JFrame {
             testMenu.add(addLogMessageItem);
         }
 
+        menuBar.add(mainMenu);
         menuBar.add(lookAndFeelMenu);
         menuBar.add(testMenu);
         return menuBar;
@@ -129,8 +107,7 @@ public class MainApplicationFrame extends JFrame {
             UIManager.setLookAndFeel(className);
             SwingUtilities.updateComponentTreeUI(this);
         } catch (ClassNotFoundException | InstantiationException
-                | IllegalAccessException | UnsupportedLookAndFeelException e) {
-            // just ignore
+                | IllegalAccessException | UnsupportedLookAndFeelException ignored) {
         }
     }
 }

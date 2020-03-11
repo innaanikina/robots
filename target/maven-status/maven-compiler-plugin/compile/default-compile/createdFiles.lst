@@ -5,6 +5,7 @@ gui\GameVisualizer$3.class
 gui\GameVisualizer.class
 gui\LogWindow.class
 gui\GameVisualizer$1.class
+gui\ExitApp.class
 log\Logger.class
 gui\GameVisualizer$2.class
 log\LogChangeListener.class
