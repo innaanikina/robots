@@ -2,10 +2,9 @@ package gui;
 
 import java.awt.Dimension;
 import java.awt.Toolkit;
-import java.awt.event.KeyEvent;
+import java.awt.event.*;
 
 import javax.swing.*;
-import gui.ExitApp;
 
 import log.Logger;
 
@@ -37,7 +36,18 @@ public class MainApplicationFrame extends JFrame {
         addWindow(gameWindow);
 
         setJMenuBar(generateMenuBar());
-        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+
+        this.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                int result = JOptionPane.showConfirmDialog(MainApplicationFrame.this,
+                        "Вы действительно хотите выйти?", "Выход", JOptionPane.YES_NO_OPTION);
+                if (result == JOptionPane.YES_OPTION) {
+                    System.exit(0);
+                }
+            }
+        });
     }
 
     protected LogWindow createLogWindow() {
@@ -85,7 +95,13 @@ public class MainApplicationFrame extends JFrame {
 
         JMenu mainMenu = addReturnTab("Программа", KeyEvent.VK_P, "Программное меню");
         JMenuItem exitItem = new JMenuItem("Выход", KeyEvent.VK_ESCAPE);
-        exitItem.addActionListener(new ExitApp());
+        exitItem.addActionListener(e -> {
+            int result = JOptionPane.showConfirmDialog(MainApplicationFrame.this,
+                    "Вы действительно хотите выйти?", "Выход", JOptionPane.YES_NO_OPTION);
+            if (result == JOptionPane.YES_OPTION) {
+                System.exit(0);
+            }
+        });
         mainMenu.add(exitItem);
 
         {

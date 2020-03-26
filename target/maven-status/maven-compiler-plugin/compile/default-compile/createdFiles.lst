@@ -10,5 +10,8 @@ log\Logger.class
 gui\GameVisualizer$2.class
 log\LogChangeListener.class
 gui\GameWindow.class
+gui\MainApplicationFrame$1.class
+gui\GameWindow$1.class
+gui\LogWindow$1.class
 gui\RobotsProgram.class
 log\LogEntry.class

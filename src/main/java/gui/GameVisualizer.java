@@ -21,15 +21,18 @@ public class  GameVisualizer extends JPanel {
         return timer;
     }
 
-    private volatile double m_robotPositionX = 100;
-    private volatile double m_robotPositionY = 100;
+    private int width = getWidth();
+    private int height = getHeight();
+
+    private volatile double m_robotPositionX = 0;
+    private volatile double m_robotPositionY = 0;
     private volatile double m_robotDirection = 0;
 
-    private volatile int m_targetPositionX = 150;
-    private volatile int m_targetPositionY = 100;
+    private volatile int m_targetPositionX = width;
+    private volatile int m_targetPositionY = height;
 
-    private static final double maxVelocity = 0.1;
-    private static final double maxAngularVelocity = 0.001;
+    private static final double maxVelocity = 0.1; //0.1
+    private static final double maxAngularVelocity = 0.001; //0.001
 
     public GameVisualizer() {
         m_timer.schedule(new TimerTask() {
@@ -98,14 +101,15 @@ public class  GameVisualizer extends JPanel {
     private static double applyLimits(double value, double min, double max) {
         if (value < min)
             return min;
-        if (value > max)
-            return max;
-        return value;
+        return Math.min(value, max);
     }
 
     private void moveRobot(double velocity, double angularVelocity, double duration) {
+
         velocity = applyLimits(velocity, 0, maxVelocity);
         angularVelocity = applyLimits(angularVelocity, -maxAngularVelocity, maxAngularVelocity);
+        double newDirection = asNormalizedRadians(m_robotDirection + angularVelocity * duration);
+
         double newX = m_robotPositionX + velocity / angularVelocity *
                 (Math.sin(m_robotDirection + angularVelocity * duration) -
                         Math.sin(m_robotDirection));
@@ -120,7 +124,6 @@ public class  GameVisualizer extends JPanel {
         }
         m_robotPositionX = newX;
         m_robotPositionY = newY;
-        double newDirection = asNormalizedRadians(m_robotDirection + angularVelocity * duration);
         m_robotDirection = newDirection;
     }
 

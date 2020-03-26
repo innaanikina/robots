@@ -4,8 +4,9 @@ import java.awt.BorderLayout;
 import java.awt.EventQueue;
 import java.awt.TextArea;
 
-import javax.swing.JInternalFrame;
-import javax.swing.JPanel;
+import javax.swing.*;
+import javax.swing.event.InternalFrameAdapter;
+import javax.swing.event.InternalFrameEvent;
 
 import log.LogChangeListener;
 import log.LogEntry;
@@ -27,6 +28,21 @@ public class LogWindow extends JInternalFrame implements LogChangeListener {
         getContentPane().add(panel);
         pack();
         updateLogContent();
+
+        this.addInternalFrameListener(new InternalFrameAdapter() {
+            @Override
+            public void internalFrameClosing(InternalFrameEvent e) {
+                int result = JOptionPane.showConfirmDialog(LogWindow.this,
+                        "Вы действительно хотите выйти?", "Выход", JOptionPane.YES_NO_OPTION);
+                if (result == JOptionPane.YES_OPTION) {
+                    LogWindow.this.setDefaultCloseOperation(EXIT_ON_CLOSE);
+                    e.getInternalFrame().dispose();
+                }
+                else if (result == JOptionPane.NO_OPTION) {
+                    LogWindow.this.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+                }
+            }
+        });
     }
 
     private void updateLogContent() {
@@ -41,5 +57,10 @@ public class LogWindow extends JInternalFrame implements LogChangeListener {
     @Override
     public void onLogChanged() {
         EventQueue.invokeLater(this::updateLogContent);
+    }
+
+    @Override
+    public void unregister() {
+        m_logSource.unregisterListener(this);
     }
 }
