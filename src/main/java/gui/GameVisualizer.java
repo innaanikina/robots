@@ -20,19 +20,15 @@ public class  GameVisualizer extends JPanel {
         Timer timer = new Timer("events generator", true);
         return timer;
     }
-
-    private int width = getWidth();
-    private int height = getHeight();
-
     private volatile double m_robotPositionX = 0;
     private volatile double m_robotPositionY = 0;
     private volatile double m_robotDirection = 0;
 
-    private volatile int m_targetPositionX = width;
-    private volatile int m_targetPositionY = height;
+    private volatile int m_targetPositionX = 100;
+    private volatile int m_targetPositionY = 150;
 
-    private static final double maxVelocity = 0.1; //0.1
-    private static final double maxAngularVelocity = 0.001; //0.001
+    private static final double maxVelocity = 0.1;
+    private static final double maxAngularVelocity = 0.001;
 
     public GameVisualizer() {
         m_timer.schedule(new TimerTask() {
@@ -105,6 +101,8 @@ public class  GameVisualizer extends JPanel {
     }
 
     private void moveRobot(double velocity, double angularVelocity, double duration) {
+        int height = this.getHeight();
+        int width = this.getWidth();
 
         velocity = applyLimits(velocity, 0, maxVelocity);
         angularVelocity = applyLimits(angularVelocity, -maxAngularVelocity, maxAngularVelocity);
@@ -122,6 +120,8 @@ public class  GameVisualizer extends JPanel {
         if (!Double.isFinite(newY)) {
             newY = m_robotPositionY + velocity * duration * Math.sin(m_robotDirection);
         }
+        newX = applyLimits(newX, 15, width - 15);
+        newY = applyLimits(newY, 15, height - 15);
         m_robotPositionX = newX;
         m_robotPositionY = newY;
         m_robotDirection = newDirection;
