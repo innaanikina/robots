@@ -4,27 +4,18 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.concurrent.*;
 
-/**
- * Что починить:
- * 1. Этот класс порождает утечку ресурсов (связанные слушатели оказываются
- * удерживаемыми в памяти)
- * 2. Этот класс хранит активные сообщения лога, но в такой реализации он
- * их лишь накапливает. Надо же, чтобы количество сообщений в логе было ограничено
- * величиной m_iQueueLength (т.е. реально нужна очередь сообщений
- * ограниченного размера)
- * потокобезопасная структура!!
- */
+
 public class LogWindowSource {
     private int m_iQueueLength;
 
-    private ConcurrentLinkedQueue<LogEntry> m_messages;
+    private final ConcurrentLinkedQueue<LogEntry> m_messages;
     private final ArrayList<LogChangeListener> m_listeners;
     private volatile LogChangeListener[] m_activeListeners;
 
     public LogWindowSource(int iQueueLength) {
         m_iQueueLength = iQueueLength;
-        m_messages = new ConcurrentLinkedQueue<LogEntry>();
-        m_listeners = new ArrayList<LogChangeListener>();
+        m_messages = new ConcurrentLinkedQueue<>();
+        m_listeners = new ArrayList<>();
     }
 
     public void registerListener(LogChangeListener listener) {
@@ -43,9 +34,11 @@ public class LogWindowSource {
 
     public void append(LogLevel logLevel, String strMessage) {
         LogEntry entry = new LogEntry(logLevel, strMessage);
+
         synchronized (m_messages){
             addNewMessage(entry);
         }
+
         LogChangeListener[] activeListeners = m_activeListeners;
         if (activeListeners == null) {
             synchronized (m_listeners) {
@@ -63,13 +56,13 @@ public class LogWindowSource {
     }
 
     private void addNewMessage(LogEntry message) {
-        if (m_messages.size() == m_iQueueLength){
+        if (size() == m_iQueueLength){
             m_messages.poll();
         }
         m_messages.add(message);
     }
 
-    public int size() {
+    private int size() {
         return m_messages.size();
     }
 

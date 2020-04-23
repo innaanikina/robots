@@ -1,21 +1,25 @@
 package gui.dialogues;
 
 import javax.swing.*;
+import java.awt.Component;
 
 public class ExitDialogue extends JOptionPane {
+
     public static void closeWindowDialogue(JFrame obj) {
-        int result = showConfirmDialog(obj,
-                "Вы действительно хотите выйти?",
-                "Выход", JOptionPane.YES_NO_OPTION);
-        if (result == JOptionPane.YES_OPTION) {
+        int res = getAnswer(obj);
+        if (res == JOptionPane.YES_OPTION) {
             System.exit(0);
         }
     }
 
     public static void closeJIF(JInternalFrame obj) {
-        int result = showConfirmDialog(obj, "Закрыть окно?",
-                "Закрыть", JOptionPane.YES_NO_OPTION);
+        int result = getAnswer(obj);
         if (result == JOptionPane.YES_OPTION)
             obj.dispose();
+    }
+
+    private static int getAnswer(Component obj) {
+        return showConfirmDialog(obj, "Закрыть окно?",
+                "Закрыть", JOptionPane.YES_NO_OPTION);
     }
 }
