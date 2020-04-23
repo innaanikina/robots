@@ -24,7 +24,7 @@ public class  GameVisualizer extends JPanel {
     private volatile double m_robotPositionY = 0;
     private volatile double m_robotDirection = 0;
 
-    private volatile int m_targetPositionX = 100;
+    private volatile int m_targetPositionX = 150;
     private volatile int m_targetPositionY = 150;
 
     private static final double maxVelocity = 0.1;

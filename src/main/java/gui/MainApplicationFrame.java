@@ -5,8 +5,11 @@ import java.awt.Toolkit;
 import java.awt.event.*;
 
 import javax.swing.*;
+import javax.swing.event.InternalFrameAdapter;
+import javax.swing.event.InternalFrameEvent;
 
 import log.Logger;
+import gui.dialogues.ExitDialogue;
 
 /**
  * Что требуется сделать:
@@ -17,8 +20,6 @@ public class MainApplicationFrame extends JFrame {
     private final JDesktopPane desktopPane = new JDesktopPane();
 
     public MainApplicationFrame() {
-        //Make the big window be indented 50 pixels from each edge
-        //of the screen.
         int inset = 50;
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         setBounds(inset, inset,
@@ -26,6 +27,7 @@ public class MainApplicationFrame extends JFrame {
                 screenSize.height - inset * 2);
 
         setContentPane(desktopPane);
+        setVisible(true);
 
 
         LogWindow logWindow = createLogWindow();
@@ -38,14 +40,11 @@ public class MainApplicationFrame extends JFrame {
         setJMenuBar(generateMenuBar());
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 
+
         this.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
-                int result = JOptionPane.showConfirmDialog(MainApplicationFrame.this,
-                        "Вы действительно хотите выйти?", "Выход", JOptionPane.YES_NO_OPTION);
-                if (result == JOptionPane.YES_OPTION) {
-                    System.exit(0);
-                }
+                ExitDialogue.closeWindowDialogue(MainApplicationFrame.this);
             }
         });
     }
@@ -63,15 +62,19 @@ public class MainApplicationFrame extends JFrame {
     protected void addWindow(JInternalFrame frame) {
         desktopPane.add(frame);
         frame.setVisible(true);
+        frame.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+        frame.addInternalFrameListener(new InternalFrameAdapter() {
+            @Override
+            public void internalFrameClosing(InternalFrameEvent e) {
+                ExitDialogue.closeJIF(frame);
+            }
+    });
     }
 
-    private void addToMenu(JMenu menu, String txt, int eventNum) {
-        JMenuItem currentItem = new JMenuItem(txt, eventNum);
-        currentItem.addActionListener((event) -> {
-            setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-            this.invalidate();
-        });
-        menu.add(currentItem);
+    private JMenuItem createMenuItem(String txt, ActionListener e, int eventNum){
+        JMenuItem item = new JMenuItem(txt, eventNum);
+        item.addActionListener(e);
+        return item;
     }
 
     private JMenu addReturnTab(String name, int key, String description) {
@@ -86,31 +89,29 @@ public class MainApplicationFrame extends JFrame {
 
         JMenu lookAndFeelMenu = addReturnTab("Режим отображения",
                 KeyEvent.VK_V, "Управление режимом отображения");
-        addToMenu(lookAndFeelMenu, "Системная схема", KeyEvent.VK_S);
-        addToMenu(lookAndFeelMenu, "Универсальная схема", KeyEvent.VK_S);
 
+        lookAndFeelMenu.add(createMenuItem("Cистемная схема", (event) ->
+        {
+            setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+            this.invalidate();
+        }, KeyEvent.VK_S));
+
+        lookAndFeelMenu.add(createMenuItem("Универсальная схема", (event) -> {
+            setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+            this.invalidate();
+        }, KeyEvent.VK_S));
 
         JMenu testMenu = addReturnTab("Тесты", KeyEvent.VK_T,
                 "Тестовые команды.");
 
         JMenu mainMenu = addReturnTab("Программа", KeyEvent.VK_P, "Программное меню");
-        JMenuItem exitItem = new JMenuItem("Выход", KeyEvent.VK_ESCAPE);
-        exitItem.addActionListener(e -> {
-            int result = JOptionPane.showConfirmDialog(MainApplicationFrame.this,
-                    "Вы действительно хотите выйти?", "Выход", JOptionPane.YES_NO_OPTION);
-            if (result == JOptionPane.YES_OPTION) {
-                System.exit(0);
-            }
-        });
-        mainMenu.add(exitItem);
+        mainMenu.add(createMenuItem("Выход", (event) -> {
+            ExitDialogue.closeWindowDialogue(MainApplicationFrame.this);
+        }, KeyEvent.VK_ESCAPE));
 
-        {
-            JMenuItem addLogMessageItem = new JMenuItem("Сообщение в лог", KeyEvent.VK_S);
-            addLogMessageItem.addActionListener((event) -> {
-                Logger.debug("Новая строка");
-            });
-            testMenu.add(addLogMessageItem);
-        }
+        testMenu.add(createMenuItem("Сообщение в лог", (event) -> {
+            Logger.debug("Новая строка");
+        }, KeyEvent.VK_S));
 
         menuBar.add(mainMenu);
         menuBar.add(lookAndFeelMenu);
