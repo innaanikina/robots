@@ -58,7 +58,7 @@ public class Saver implements Serializable{
 
     private String getCurrentPath(String name) {
         String filePath = new File("").getAbsolutePath();
-        return filePath.substring(0, filePath.length() - 6) + "src/main/resources/" + name;
+        return filePath.substring(0, filePath.length() - 6) + "src/main/resources/" + name + ".out";
     }
 
     public static void main(String[] args) throws IOException, ClassNotFoundException {
