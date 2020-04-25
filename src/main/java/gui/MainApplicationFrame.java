@@ -3,6 +3,7 @@ package gui;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.Arrays;
+import java.util.HashMap;
 
 import javax.swing.*;
 import javax.swing.event.InternalFrameAdapter;
@@ -62,11 +63,6 @@ public class MainApplicationFrame extends JFrame {
         frame.addInternalFrameListener(new InternalFrameAdapter() {
             @Override
             public void internalFrameClosing(InternalFrameEvent e) {
-                //TODO Delete this!!
-                System.out.println(frame.getTitle());
-                System.out.println("x = " + frame.getX());
-                System.out.println("y = " + frame.getY());
-
                 ExitDialogue.closeJIF(frame);
             }
     });
@@ -132,25 +128,32 @@ public class MainApplicationFrame extends JFrame {
     
     private void saveWindows() {
         JInternalFrame[] frames = desktopPane.getAllFrames();
+        Saver[] saves = new Saver[frames.length];
+
         System.out.println("Saving method.\nFrames:");
         System.out.println(Arrays.toString(frames));
 
-        for (JInternalFrame f : frames) {
-            String title = f.getTitle();
-            Saver frm = new Saver(title, f.getX(), f.getY());
-            frm.save(title);
-            System.out.println(frm);
+        for (int i = 0; i < frames.length; i++) {
+            String title = frames[i].getTitle();
+            Saver frm = new Saver(title, frames[i].getX(), frames[i].getY());
+            saves[i] = frm;
         }
+
+        System.out.println("saves: ");
+        System.out.println(Arrays.toString(saves));
+
+        Saver.saveAll(saves);
     }
 
     private void restoreWindows() {
         System.out.println("Entering restore method");
         JInternalFrame[] frames = desktopPane.getAllFrames();
-        Saver frm = new Saver();
-        for (JInternalFrame e : frames) {
-            frm.restore(e.getTitle());
-            e.setTitle(frm.getTitle());
-            e.setLocation(frm.getLocation());
+        int count = frames.length;
+        HashMap<String, Point> restored = Saver.restoreAll(count);
+
+        for (JInternalFrame frm : frames) {
+            Point p = restored.get(frm.getTitle());
+            frm.setLocation(p);
         }
     }
     
