@@ -13,5 +13,6 @@ log\LogChangeListener.class
 gui\MainApplicationFrame$2.class
 gui\GameWindow.class
 gui\MainApplicationFrame$1.class
+gui\Saver.class
 gui\RobotsProgram.class
 log\LogEntry.class

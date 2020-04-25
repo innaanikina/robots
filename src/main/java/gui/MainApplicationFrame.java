@@ -1,15 +1,14 @@
 package gui;
 
-import java.awt.Dimension;
-import java.awt.Toolkit;
+import java.awt.*;
 import java.awt.event.*;
+import java.util.Arrays;
 
 import javax.swing.*;
 import javax.swing.event.InternalFrameAdapter;
 import javax.swing.event.InternalFrameEvent;
 
 import log.Logger;
-import gui.ExitApp;
 import gui.dialogues.ExitDialogue;
 
 public class MainApplicationFrame extends JFrame {
@@ -25,7 +24,6 @@ public class MainApplicationFrame extends JFrame {
         setContentPane(desktopPane);
         setVisible(true);
 
-
         LogWindow logWindow = createLogWindow();
         addWindow(logWindow);
 
@@ -36,9 +34,12 @@ public class MainApplicationFrame extends JFrame {
         setJMenuBar(generateMenuBar());
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 
+        restoreWindows();
+
         this.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
+                saveWindows();
                 ExitDialogue.closeWindowDialogue(MainApplicationFrame.this);
             }
         });
@@ -61,6 +62,11 @@ public class MainApplicationFrame extends JFrame {
         frame.addInternalFrameListener(new InternalFrameAdapter() {
             @Override
             public void internalFrameClosing(InternalFrameEvent e) {
+                //TODO Delete this!!
+                System.out.println(frame.getTitle());
+                System.out.println("x = " + frame.getX());
+                System.out.println("y = " + frame.getY());
+
                 ExitDialogue.closeJIF(frame);
             }
     });
@@ -101,6 +107,7 @@ public class MainApplicationFrame extends JFrame {
 
         JMenu mainMenu = addReturnTab("Программа", KeyEvent.VK_P, "Программное меню");
         mainMenu.add(createMenuItem("Выход", (event) -> {
+            saveWindows();
             ExitDialogue.closeWindowDialogue(MainApplicationFrame.this);
         }, KeyEvent.VK_ESCAPE));
 
@@ -122,4 +129,29 @@ public class MainApplicationFrame extends JFrame {
                 | IllegalAccessException | UnsupportedLookAndFeelException ignored) {
         }
     }
+    
+    private void saveWindows() {
+        JInternalFrame[] frames = desktopPane.getAllFrames();
+        System.out.println("Saving method.\nFrames:");
+        System.out.println(Arrays.toString(frames));
+
+        for (JInternalFrame f : frames) {
+            String title = f.getTitle();
+            Saver frm = new Saver(title, f.getX(), f.getY());
+            frm.save(title);
+            System.out.println(frm);
+        }
+    }
+
+    private void restoreWindows() {
+        System.out.println("Entering restore method");
+        JInternalFrame[] frames = desktopPane.getAllFrames();
+        Saver frm = new Saver();
+        for (JInternalFrame e : frames) {
+            frm.restore(e.getTitle());
+            e.setTitle(frm.getTitle());
+            e.setLocation(frm.getLocation());
+        }
+    }
+    
 }
