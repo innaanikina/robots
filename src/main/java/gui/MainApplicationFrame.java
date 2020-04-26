@@ -2,7 +2,9 @@ package gui;
 
 import java.awt.*;
 import java.awt.event.*;
-import java.util.Arrays;
+import java.beans.PropertyVetoException;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 
 import javax.swing.*;
@@ -14,6 +16,7 @@ import gui.dialogues.ExitDialogue;
 
 public class MainApplicationFrame extends JFrame {
     private final JDesktopPane desktopPane = new JDesktopPane();
+    private HashMap<String, JInternalFrame> allFrames = new HashMap<>();
 
     public MainApplicationFrame() {
         int inset = 50;
@@ -26,11 +29,13 @@ public class MainApplicationFrame extends JFrame {
         setVisible(true);
 
         LogWindow logWindow = createLogWindow();
-        addWindow(logWindow);
+        allFrames.put(logWindow.getTitle(), logWindow);
+        //addWindow(logWindow);
 
         GameWindow gameWindow = new GameWindow();
         gameWindow.setSize(400, 400);
-        addWindow(gameWindow);
+        allFrames.put(gameWindow.getTitle(), gameWindow);
+        //addWindow(gameWindow);
 
         setJMenuBar(generateMenuBar());
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
@@ -130,30 +135,30 @@ public class MainApplicationFrame extends JFrame {
         JInternalFrame[] frames = desktopPane.getAllFrames();
         Saver[] saves = new Saver[frames.length];
 
-        System.out.println("Saving method.\nFrames:");
-        System.out.println(Arrays.toString(frames));
-
         for (int i = 0; i < frames.length; i++) {
             String title = frames[i].getTitle();
-            Saver frm = new Saver(title, frames[i].getX(), frames[i].getY());
+            Saver frm = new Saver(title, frames[i].getLocation(),
+                    frames[i].isIcon(), frames[i].getSize());
             saves[i] = frm;
         }
-
-        System.out.println("saves: ");
-        System.out.println(Arrays.toString(saves));
 
         Saver.saveAll(saves);
     }
 
     private void restoreWindows() {
-        System.out.println("Entering restore method");
-        JInternalFrame[] frames = desktopPane.getAllFrames();
-        int count = frames.length;
-        HashMap<String, Point> restored = Saver.restoreAll(count);
-
-        for (JInternalFrame frm : frames) {
-            Point p = restored.get(frm.getTitle());
-            frm.setLocation(p);
+        int count = allFrames.size();
+        ArrayList<Saver> restored = Saver.restoreAll(count);
+        Collections.reverse(restored);
+        for (int i = 0; i < count; i++) {
+            JInternalFrame frm = allFrames.get(restored.get(i).getName());
+            addWindow(frm);
+            frm.setLocation(restored.get(i).getLocation());
+            try {
+                frm.setIcon(restored.get(i).getIsIcon());
+            } catch (PropertyVetoException e) {
+                System.out.println(e.getMessage());
+            }
+            frm.setSize(restored.get(i).getSize());
         }
     }
     
