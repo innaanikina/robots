@@ -14,6 +14,8 @@ import javax.swing.event.InternalFrameEvent;
 import log.Logger;
 import gui.dialogues.ExitDialogue;
 
+//TODO прибраться в создании графики: панели, контекстных меню и т.п.
+
 public class MainApplicationFrame extends JFrame {
     private final JDesktopPane desktopPane = new JDesktopPane();
     private HashMap<String, JInternalFrame> allFrames = new HashMap<>();
@@ -30,12 +32,10 @@ public class MainApplicationFrame extends JFrame {
 
         LogWindow logWindow = createLogWindow();
         allFrames.put(logWindow.getTitle(), logWindow);
-        //addWindow(logWindow);
 
         GameWindow gameWindow = new GameWindow();
         gameWindow.setSize(400, 400);
         allFrames.put(gameWindow.getTitle(), gameWindow);
-        //addWindow(gameWindow);
 
         setJMenuBar(generateMenuBar());
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
@@ -105,6 +105,9 @@ public class MainApplicationFrame extends JFrame {
 
         JMenu testMenu = addReturnTab("Тесты", KeyEvent.VK_T,
                 "Тестовые команды.");
+        testMenu.add(createMenuItem("Сообщение в лог", (event) -> {
+            Logger.debug("Новая строка");
+        }, KeyEvent.VK_S));
 
         JMenu mainMenu = addReturnTab("Программа", KeyEvent.VK_P, "Программное меню");
         mainMenu.add(createMenuItem("Выход", (event) -> {
@@ -112,9 +115,6 @@ public class MainApplicationFrame extends JFrame {
             ExitDialogue.closeWindowDialogue(MainApplicationFrame.this);
         }, KeyEvent.VK_ESCAPE));
 
-        testMenu.add(createMenuItem("Сообщение в лог", (event) -> {
-            Logger.debug("Новая строка");
-        }, KeyEvent.VK_S));
 
         menuBar.add(mainMenu);
         menuBar.add(lookAndFeelMenu);
@@ -131,7 +131,7 @@ public class MainApplicationFrame extends JFrame {
         }
     }
     
-    private void saveWindows() {
+    public void saveWindows() {
         JInternalFrame[] frames = desktopPane.getAllFrames();
         Saver[] saves = new Saver[frames.length];
 

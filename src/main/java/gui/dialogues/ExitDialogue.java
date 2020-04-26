@@ -19,7 +19,8 @@ public class ExitDialogue extends JOptionPane {
     }
 
     private static int getAnswer(Component obj) {
-        return showConfirmDialog(obj, "Закрыть окно?",
+        return JOptionPane.showConfirmDialog(obj, "Закрыть окно?",
                 "Закрыть", JOptionPane.YES_NO_OPTION);
     }
+
 }
