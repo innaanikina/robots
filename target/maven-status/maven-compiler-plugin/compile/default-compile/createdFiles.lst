@@ -1,7 +1,6 @@
 gui\MainApplicationFrame.class
 log\LogWindowSource.class
 log\LogLevel.class
-gui\dialogues\Exit.class
 gui\dialogues\ExitDialogue.class
 gui\GameVisualizer$3.class
 gui\GameVisualizer.class
@@ -11,9 +10,9 @@ gui\ExitApp.class
 log\Logger.class
 gui\GameVisualizer$2.class
 log\LogChangeListener.class
+gui\MainApplicationFrame$2.class
 gui\GameWindow.class
 gui\MainApplicationFrame$1.class
-gui\dialogues\Exit$1.class
 gui\Saver.class
 gui\RobotsProgram.class
 log\LogEntry.class

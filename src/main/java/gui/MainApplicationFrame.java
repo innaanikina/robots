@@ -3,8 +3,6 @@ package gui;
 import java.awt.*;
 import java.awt.event.*;
 import java.beans.PropertyVetoException;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 
 import javax.swing.*;
@@ -13,8 +11,6 @@ import javax.swing.event.InternalFrameEvent;
 
 import log.Logger;
 import gui.dialogues.ExitDialogue;
-
-//TODO прибраться в создании графики: панели, контекстных меню и т.п.
 
 public class MainApplicationFrame extends JFrame {
     private final JDesktopPane desktopPane = new JDesktopPane();
@@ -146,19 +142,20 @@ public class MainApplicationFrame extends JFrame {
     }
 
     private void restoreWindows() {
-        int count = allFrames.size();
-        ArrayList<Saver> restored = Saver.restoreAll(count);
-        Collections.reverse(restored);
-        for (int i = 0; i < count; i++) {
-            JInternalFrame frm = allFrames.get(restored.get(i).getName());
+        HashMap<String, Saver> restored = Saver.restore();
+        for (String frmName : allFrames.keySet()) {
+            Saver restoredFrame = restored.get(frmName);
+            JInternalFrame frm = allFrames.get(frmName);
             addWindow(frm);
-            frm.setLocation(restored.get(i).getLocation());
             try {
-                frm.setIcon(restored.get(i).getIsIcon());
+                frm.setLocation(restoredFrame.getLocation());
+                frm.setIcon(restoredFrame.getIsIcon());
+                frm.setSize(restoredFrame.getSize());
             } catch (PropertyVetoException e) {
                 System.out.println(e.getMessage());
+            } catch (NullPointerException e) {
+                System.out.println(frmName + " is restored with default settings");
             }
-            frm.setSize(restored.get(i).getSize());
         }
     }
     

@@ -2,7 +2,7 @@ package gui;
 
 import java.awt.*;
 import java.io.*;
-import java.util.ArrayList;
+import java.util.HashMap;
 
 public class Saver implements Serializable{
     private String name;
@@ -46,26 +46,30 @@ public class Saver implements Serializable{
         return filePath.substring(0, filePath.length() - 6) + "src/main/resources/windows.bin";
     }
 
-    public static ArrayList<Saver> restoreAll(int count) {
-        ArrayList<Saver> restored = new ArrayList<>();
 
+    public static HashMap<String, Saver> restore() {
+        HashMap<String, Saver> restored = new HashMap<>();
         String filePath = getCurrentPath();
         try {
             ObjectInputStream in = new ObjectInputStream(new FileInputStream(filePath));
+            int count = in.readInt();
             for (int i = 0; i < count; i++) {
                 Saver obj = (Saver) in.readObject();
-                restored.add(obj);
+                restored.put(obj.getName(), obj);
             }
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
         }
+
         return restored;
     }
 
     public static void saveAll(Saver[] frames) {
         String filePath = getCurrentPath();
+        int count = frames.length;
         try{
             ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(filePath));
+            out.writeInt(count);
             for (Saver frame : frames) {
                 out.writeObject(frame);
             }
