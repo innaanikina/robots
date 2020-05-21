@@ -2,6 +2,7 @@ package gui;
 
 import java.awt.*;
 import java.awt.geom.AffineTransform;
+import java.util.Random;
 
 public class Robot {
     private volatile double m_robotPositionX;
@@ -12,7 +13,11 @@ public class Robot {
     private volatile int m_targetPositionY = 150;
 
     private static final double maxVelocity = 0.1;
-    private static final double maxAngularVelocity = 0.001;
+    private static final double maxAngularVelocity = 0.002;
+
+    private int count;
+
+    public String name;
 
     public Robot() {
         this.m_robotPositionX = 0;
@@ -68,6 +73,11 @@ public class Robot {
     private void moveRobot(double velocity, double angularVelocity, double duration, Dimension win) {
         int height = win.height;
         int width = win.width;
+        if (count < 3) {
+            System.out.println("height is " + height + ", width is " + width);
+            System.out.println("name is " + name);
+            count++;
+        }
 
         velocity = applyLimits(velocity, 0, maxVelocity);
         angularVelocity = applyLimits(angularVelocity, -maxAngularVelocity, maxAngularVelocity);
@@ -98,6 +108,12 @@ public class Robot {
         return Math.min(value, max);
     }
 
+    private static int applyLimits(int value, int min, int max) {
+        if (value < min)
+            return min;
+        return Math.min(value, max);
+    }
+
     protected void onModelUpdateEvent(Dimension window) {
         double distance = distance(m_targetPositionX, m_targetPositionY,
                 m_robotPositionX, m_robotPositionY);
@@ -118,8 +134,8 @@ public class Robot {
     }
 
     protected void drawRobot(Graphics2D g, int x, int y, double direction) {
-        int robotCenterX = round(m_robotPositionX);
-        int robotCenterY = round(m_robotPositionY);
+        int robotCenterX = round(x);
+        int robotCenterY = round(y);
         AffineTransform t = AffineTransform.getRotateInstance(direction, robotCenterX, robotCenterY);
         g.setTransform(t);
         g.setColor(Color.MAGENTA);
@@ -150,5 +166,46 @@ public class Robot {
     }
     private static int round(double value) {
         return (int) (value + 0.5);
+    }
+
+    protected void autoMove(int width, int height) {
+        Point newTargetCoordinates = calculateTargetCoordinates(width, height);
+        System.out.println("I AM HERE");
+        System.out.println("Target position: " + m_targetPositionX + " " + m_targetPositionY);
+        System.out.println("Robot position: " + m_robotPositionX + " " + m_robotPositionY);
+        if (m_targetPositionX == 150 && m_targetPositionY == 150) {
+            System.out.println("New target calcuations 1");
+            m_targetPositionX = newTargetCoordinates.x;
+            m_targetPositionY = newTargetCoordinates.y;
+        }
+        double distance = distance(m_targetPositionX, m_targetPositionY,
+                m_robotPositionX, m_robotPositionY);
+        System.out.println("Distance is " + distance);
+        if (distance < 0.5) {
+            System.out.println("New target calcuations 2");
+            Random rand = new Random();
+            int x = applyLimits(rand.nextInt(width - 25), 0, width - 25);
+            int y = applyLimits(rand.nextInt(height - 25), 0, width - 25);
+
+            int counter = 0;
+            while (x == m_targetPositionX || y == m_targetPositionY) {
+                System.out.println("couter is " + counter);
+                counter++;
+                x = applyLimits(rand.nextInt(width - 15), 25, width - 25);
+                y = applyLimits(rand.nextInt(height - 15), 25, width - 25);
+            }
+
+            Point coords = calculateTargetCoordinates(width, height);
+            System.out.println("Calculated coordinates: " + x + " " + y);
+            m_targetPositionX = x;
+            m_targetPositionY = y;
+        }
+    }
+
+    private Point calculateTargetCoordinates(int width, int height) {
+        Random rand = new Random();
+        int x = applyLimits(rand.nextInt(width), 25, width - 25);
+        int y = applyLimits(rand.nextInt(height), 25, width - 25);
+        return new Point(x, y);
     }
 }

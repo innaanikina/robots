@@ -10,8 +10,10 @@ import java.util.TimerTask;
 public class  GameVisualizer extends JPanel {
 
     private Robot[] robots;
-    private Robot robot;
+    private Robot userRobot;
     private Timer m_timer;
+
+    private int count;
 
     private static Timer initTimer() {
         Timer timer = new Timer("events generator", true);
@@ -33,24 +35,25 @@ public class  GameVisualizer extends JPanel {
         m_timer.schedule(new TimerTask() {
             @Override
             public void run() {
-                Dimension window = GameVisualizer.this.getSize();
+                Dimension window = getSize();
                 robots[0].onModelUpdateEvent(window);
             }
-        }, 0, 10);
+        }, 100, 10);
         m_timer.schedule(new TimerTask() {
             @Override
             public void run() {
-                Dimension window = GameVisualizer.this.getSize();
+                Dimension window = getSize();
                 robots[1].onModelUpdateEvent(window);
+                robots[1].autoMove(window.width, window.height);
             }
-        }, 0, 10);
+        }, 100, 10);
         m_timer.schedule(new TimerTask() {
             @Override
             public void run() {
-                Dimension window = GameVisualizer.this.getSize();
+                Dimension window = getSize();
                 robots[2].onModelUpdateEvent(window);
             }
-        }, 0, 10);
+        }, 100, 10);
         addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -71,6 +74,10 @@ public class  GameVisualizer extends JPanel {
         Graphics2D g2d = (Graphics2D) g;
         for (Robot robot : robots) {
             Point robotPosition = robot.getRobotPosition();
+            if (count < 3) {
+                System.out.println(robotPosition + robot.name);
+                count++;
+            }
             robot.drawRobot(g2d, robotPosition.x, robotPosition.y, robot.getRobotDirection());
             Point targetPosition = robot.getTargetPosition();
             robot.drawTarget(g2d, targetPosition.x, targetPosition.y);
@@ -79,17 +86,18 @@ public class  GameVisualizer extends JPanel {
 
     private void initRobots(int count) {
         robots = new Robot[count];
-        int width = 400 / (count + 1);
-        System.out.println(width);
-        Robot robot1 = new Robot(width, 0);
-        Robot robot2 = new Robot(width * 2, 0);
-        Robot robot3 = new Robot(width * 3, 0);
-        robot2.setTargetPosition(new Point(100, 200));
-        robot3.setTargetPosition(new Point(200, 100));
 
+        int width = 400 / (count + 1); //как посчитать имеющуюся ширину??
+        for (int i = 0; i < count; i++) {
+            Robot robot = new Robot((i + 1) * width, 15);
+            robots[i] = robot;
+        }
 
-        robots[0] = robot1;
-        robots[1] = robot2;
-        robots[2] = robot3;
+        robots[1].setTargetPosition(new Point(150, 150));
+        robots[2].setTargetPosition(new Point(200, 100));
+
+        robots[0].name = "1";
+        robots[1].name = "2";
+        robots[2].name = "3";
     }
 }
