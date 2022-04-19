@@ -14,7 +14,7 @@ import gui.dialogues.ExitDialogue;
 
 public class MainApplicationFrame extends JFrame {
     private final JDesktopPane desktopPane = new JDesktopPane();
-    private HashMap<String, JInternalFrame> allFrames = new HashMap<>();
+    private final HashMap<String, JInternalFrame> allFrames = new HashMap<>();
 
     public MainApplicationFrame() {
         int inset = 50;
